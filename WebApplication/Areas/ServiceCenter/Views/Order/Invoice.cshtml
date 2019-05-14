@@ -1,0 +1,459 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Invoice
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<input id="affiliateId" type="hidden" value="@Model.AffiliateId">
+<input id="customerId" type="hidden" value="@Model.CustomerId">
+
+<br />
+
+<div id="errorMessage" class="alert alert-danger col-sm-12" role="alert" style="display:none">
+</div>
+
+<br />
+@* ••••••••• Customer Details ••••••••• *@
+<div class="row panel panel-info" style="padding:8px;background-color:@ViewData[string.Concat("AffiliateRgba", Model.Affiliate.AffiliateId)];">
+    @{await Html.RenderPartialAsync("CustomerDetailsPartial", Model); }
+</div>
+@* ••••••••• Search ••••••••• *@
+<div class="row">
+    <div class="col-xs-5">
+        <div class="col-xs-10">
+            <input id="searchPznInput" class="form-control" type="text" placeholder="@Localizer["ArticleSearchValue"].Value">
+        </div>
+        <div class="col-xs-2">
+            <button id="searchPznButton" class="btn btn-success">
+                <i class="glyphicon glyphicon-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-xs-1">
+    </div>
+    <div class="col-xs-6">
+        <button id="showRecentOrderedItemsButton" class="btn btn-primary">
+            @Localizer["RecentlyOrdered"].Value
+        </button>
+        <button id="showOftenOrderedItemsButton" class="btn btn-primary">
+            @Localizer["OftenOrdered"].Value
+        </button>
+        <button id="showOftenOrderedItemsButton" class="btn btn-primary" onclick="addSpecialItem(8000800, 0);">
+            @Localizer["Prescription"].Value
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div id="articleSearchResults" style="display:none">
+    </div>
+</div>
+<hr />
+<br />
+@* ••••••••• Order ••••••••• *@
+<div class="row">
+    @{await Html.RenderPartialAsync("InvoiceItems", Model.InvoiceItems);}
+</div>
+<hr />
+@* ••••••••• Navigation ••••••••• *@
+<div class="row">
+    <div class="col-sm-12">
+        <a class="btn btn-danger btn-sm" role="button" asp-area="ServiceCenter" asp-action="CustomerSearch"><i class="glyphicon glyphicon-remove"></i></a>
+        <div class="btn-toolbar" style="float:right">
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="Comment"><i class="glyphicon glyphicon-pencil"></i></a>
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="DeliveryPayment"><i class="glyphicon glyphicon-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+
+        /* Article Search */
+
+        $('#searchPznInput').bind("enterKey", function (e) { searchPzn(); });
+        $('#searchPznInput').keyup(function (e) { if (e.keyCode == 13) { $(this).trigger("enterKey"); } });
+
+        $('#searchPznButton').bind("enterKey", function (e) { searchPzn(); });
+        $('#searchPznButton').click(function (e) { searchPzn(); });
+
+        $('#showRecentOrderedItemsButton').bind("enterKey", function (e) { showRecentOrderedItems(); });
+        $('#showRecentOrderedItemsButton').click(function (e) { showRecentOrderedItems(); });
+
+        $('#showOftenOrderedItemsButton').bind("enterKey", function (e) { showOftenOrderedItems(); });
+        $('#showOftenOrderedItemsButton').click(function (e) { showOftenOrderedItems(); });
+
+        function enableSearchButtons() {
+            $('#articleSearchResults').fadeIn();
+
+            $('#searchPznButton').removeClass("disabled");
+            $('#searchPznButton').removeAttr('disabled');
+
+            $('#showRecentOrderedItemsButton').removeClass("disabled");
+            $('#showRecentOrderedItemsButton').removeAttr('disabled', 'disabled');
+
+            $('#showOftenOrderedItemsButton').removeClass("disabled");
+            $('#showOftenOrderedItemsButton').removeAttr('disabled', 'disabled');
+        }
+
+        function disableSearchButtons() {
+            $('#articleSearchResults').fadeOut();
+
+            $('#errorMessage').fadeOut();
+            $('#errorMessage').text(null);
+
+            $('#searchPznButton').addClass("disabled");
+            $('#searchPznButton').attr('disabled', 'disabled');
+
+            $('#showRecentOrderedItemsButton').addClass("disabled");
+            $('#showRecentOrderedItemsButton').attr('disabled', 'disabled');
+
+            $('#showOftenOrderedItemsButton').addClass("disabled");
+            $('#showOftenOrderedItemsButton').attr('disabled', 'disabled');
+        }
+
+        function searchPzn(pzn) {
+            try {
+                disableSearchButtons();
+
+                if(pzn == null)
+                    pzn = $('#searchPznInput').val();
+
+                $.ajax({
+                    url: "@Url.Action("PznSearchResults", "Order")",
+                    traditional: true,
+                    data: {
+                        affiliateId: $('#affiliateId').val(),
+                        searchField: pzn
+                    },
+                    type: 'GET',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                        $('#articleSearchResults').html(result);
+                        enableSearchButtons();
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                        enableSearchButtons();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+                enableSearchButtons();
+            }
+            finally {
+            }
+        }
+
+        function showOftenOrderedItems() {
+            try {
+                disableSearchButtons();
+
+                $.ajax({
+                    url: "@Url.Action("GetOftenOrderedItems", "Order")",
+                    traditional: true,
+                    data: {
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val()
+                    },
+                    type: 'GET',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                        $('#articleSearchResults').html(result);
+                        enableSearchButtons();
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                        enableSearchButtons();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+                enableSearchButtons();
+            }
+            finally {
+            }
+        }
+
+        function showRecentOrderedItems() {
+            try {
+                disableSearchButtons();
+
+                $.ajax({
+                    url: "@Url.Action("GetRecentOrderedItems", "Order")",
+                    traditional: true,
+                    data: {
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val()
+                    },
+                    type: 'GET',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                        $('#articleSearchResults').html(result);
+                        enableSearchButtons();
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                        enableSearchButtons();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+                enableSearchButtons();
+            }
+            finally {
+            }
+        }
+
+        /* Invoice Items */
+
+        function addInvoiceItem(pzn, vat, itemPrice, priceSavings) {
+            try {
+                $.ajax({
+                    url: "@Url.Action("AddInvoiceItem", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        pzn: pzn,
+                        quantity: 1,
+                        vat: vat,
+                        itemPrice: itemPrice,
+                        priceSavings: priceSavings
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                        $('#articleSearchResults').fadeOut();
+                        $('#invoiceItems').html(result);
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Additional Special Items */
+        function addSpecialItem(pzn, itemPrice) {
+            try {
+                $.ajax({
+                    url: "@Url.Action("AddSpecialItem", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        pzn: pzn,
+                        itemPrice: itemPrice
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                        $('#articleSearchResults').fadeOut();
+                        $('#invoiceItems').html(result);
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        function removeInvoiceItem(invoiceItemId) {
+            try {
+
+                $.ajax({
+                    url: "@Url.Action("RemoveInvoiceItem", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        invoiceItemId: invoiceItemId
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                            $('#invoiceItems').html(result)
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        function updateInvoiceItemQuantity(invoiceItemId, quantity) {
+            try {
+
+                $.ajax({
+                    url: "@Url.Action("UpdateInvoiceItemQuantity", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        invoiceItemId: invoiceItemId,
+                        quantity: quantity
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                            $('#invoiceItems').html(result)
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        function incrementInvoiceItem(invoiceItemId) {
+            try {
+
+                $.ajax({
+                    url: "@Url.Action("incrementinvoiceitem", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        invoiceItemId: invoiceItemId
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                            $('#invoiceItems').html(result)
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        function decrementInvoiceItem(invoiceItemId) {
+            try {
+
+                $.ajax({
+                    url: "@Url.Action("decrementinvoiceitem", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        invoiceItemId: invoiceItemId
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                    .then(function (result) {
+                            $('#invoiceItems').html(result)
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Price Comparison */
+
+        function showPriceComparison(pzn) {
+            try {
+                $.ajax({
+                    url: "@Url.Action("GetComparisonPrices", "Order")",
+                    traditional: true,
+                    data: {
+                        affiliateId: $('#affiliateId').val(),
+                        pzn: pzn
+                    },
+                    type: 'GET',
+                    dataType: 'text'
+
+                })
+                    .then(function (result) {
+                        if (result != null && result != "") {
+                            $('#priceComparisonDiv' + pzn).text(result);
+                            }
+                        else {
+                            $('#priceComparisonDiv' + pzn).text('@Localizer["NoComparisonPrices"].Value');
+                            }
+                        $('#priceComparisonTd' + pzn).fadeIn('slow');
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* -------------------- */
+
+    </script>
+}

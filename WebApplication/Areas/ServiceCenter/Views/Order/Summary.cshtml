@@ -1,0 +1,281 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Summary
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<input id="affiliateId" type="hidden" value="@Model.AffiliateId">
+<input id="customerId" type="hidden" value="@Model.CustomerId">
+
+<br />
+
+<div id="errorMessage" class="alert alert-danger col-sm-12" role="alert" style="@(ViewData.ModelState.ErrorCount == 0? "display:none" : "display:block")">
+    <ul>
+        @foreach (Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry modelState in ViewData.ModelState.Values)
+        {
+            foreach (Microsoft.AspNetCore.Mvc.ModelBinding.ModelError error in modelState.Errors)
+            {
+                <li>@Localizer[@error.ErrorMessage].Value</li>
+            }
+        }
+    </ul>
+</div>
+
+<br />
+@* ••••••••• Customer ••••••••• *@
+<div class="row">
+    <div class="col-sm-6 @(ViewData.ModelState.Count(x => x.Key == "Customer") > 0 ? "alert alert-danger" : "panel panel-info")">
+        <div class="text-info">
+            @Localizer["Customer"].Value
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>@Localizer["CustomerNumber"].Value:&nbsp;</strong></td>
+                    <td>@Model.CustomerNumber</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["CustomerName"].Value:&nbsp;</strong></td>
+                    <td>@Model.BillingAddress.FullName</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["CustomerAddress"].Value:&nbsp;</strong></td>
+                    <td>@Model.BillingAddress.FullAddress.ToString()</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["CustomerEmail"].Value:&nbsp;</strong></td>
+                    <td>@Model.BillingAddress.EmailAddress</td>
+                </tr>
+                @if (!string.IsNullOrEmpty(@Model.CustomerGroupName))
+                {
+                    <tr>
+                        <td><strong>@Localizer["CustomerGroup"].Value:&nbsp;</strong></td>
+                        <td>
+                            @Model.CustomerGroupName
+                            @if (Model.CustomerGroupDiscount != 0)
+                            {
+                                @Html.Raw("&nbsp;(")
+                                @Model.CustomerGroupDiscount.ToString("0")
+                                @Html.Raw("%)")
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-6 @(ViewData.ModelState.Count(x => x.Key == "DeliveryAddress") > 0 ? "alert alert-danger" : "panel panel-info")">
+        <span class="text-info">@Localizer["DeliveryAddress"].Value</span>
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressTitle"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.Title</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressFirstName"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.FirstName</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressLastName"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.LastName</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressCompanyName"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.CompanyName</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressStreet"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.Street</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressCity"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.City</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressZip"].Value:&nbsp;</strong></td>
+                    <td>@Model.DeliveryAddress.Zip</td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["DeliveryAddressCountry"].Value:&nbsp;</strong></td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(@Model.DeliveryAddress.Country))
+                        {
+                            @Localizer[@Model.DeliveryAddress.Country].Value
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>@Localizer["AdditionalLine"].Value:&nbsp;</strong></td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(@Model.DeliveryAddress.AdditionalLine))
+                        {
+                            @Localizer[@Model.DeliveryAddress.AdditionalLine].Value
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6 @(ViewData.ModelState.Count(x => x.Key == "Payment") > 0 ? "alert alert-danger" : "panel panel-info")">
+        <span class="text-info">@Localizer["Payment"].Value</span>
+        <table>
+            <tbody>
+                @if (Model.PaymentTypes.Count(x => x.PaymentTypeId == Model.PaymentTypeId) == 1)
+                {
+                    <tr>
+                        <td><strong>@Localizer["PaymentType"].Value:&nbsp;</strong></td>
+                        <td>
+                            @Model.PaymentTypes.Single(x => x.PaymentTypeId == Model.PaymentTypeId).PaymentTypeName
+                        </td>
+                    </tr>
+                }
+                @if (Model.PaymentTypeId == 5)
+                {
+                    <tr>
+                        <td><strong>@Localizer["IBAN"].Value:&nbsp;</strong></td>
+                        <td>
+                            @Model.Iban
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>@Localizer["BIC"].Value:&nbsp;</strong></td>
+                        <td>
+                            @Model.Bic
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>@Localizer["AccountOwner"].Value:&nbsp;</strong></td>
+                        <td>
+                            @Model.AccountOwner
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-6 @(ViewData.ModelState.Count(x => x.Key == "Delivery") > 0 ? "alert alert-danger" : "panel panel-info")">
+
+        <span class="text-info">@Localizer["Delivery"].Value</span>
+        <table>
+            <tbody>
+                @if (Model.DeliveryTypes.Count(x => x.DeliveryTypeId == Model.DeliveryTypeId) == 1)
+                {
+                    <tr>
+                        <td><strong>@Localizer["DeliveryType"].Value:&nbsp;</strong></td>
+                        <td>
+                            @Model.DeliveryTypes.Single(x => x.DeliveryTypeId == Model.DeliveryTypeId).DeliveryTypeName
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 @(ViewData.ModelState.Count(x => x.Key == "Items") > 0 ? "alert alert-danger" : "panel panel-info")">
+        <span class="text-info">@Localizer["Items"].Value</span>
+        <table class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        @Localizer["ItemsPzn"].Value
+                    </th>
+                    <th>
+                        @Localizer["ItemsName"].Value
+                    </th>
+                    <th style="width:75px">
+                        @Localizer["ItemsPrice"].Value
+                    </th>
+                    <th style="width:75px">
+                        @Localizer["ItemsQuantity"].Value
+                    </th>
+                    <th style="width:75px">
+                        @Localizer["ItemsTotalPrice"].Value
+                    </th>
+                    <th style="width:75px">
+                        @Localizer["ItemsPriceSavings"].Value
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var article in Model.InvoiceItems.Items.Where(x => x.PZN >= Model.InvoiceItems.OrderItemPznLimit && !Model.InvoiceItems.AllKnownFeePzns.Contains(x.PZN)).OrderBy(y => y.InvoiceItemId))
+                {
+                <tr>
+                    <td>
+                        @article.PZN.ToString(Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Summary.PZNStringFormat)
+                    </td>
+                    <td>
+                        @article.DisplayName
+                    </td>
+                    <td>
+                        @article.Price.ToString("0.00 €")
+                    </td>
+                    <td>
+                        @article.Quantity
+                    </td>
+                    <td>
+                        @article.TotalPrice.ToString("0.00 €")
+                    </td>
+                    <td>
+                        @article.PriceSavings.ToString("0.00 €")
+                    </td>
+                </tr>
+                }
+                @foreach (var article in Model.InvoiceItems.Items.Where(x => x.PZN < Model.InvoiceItems.OrderItemPznLimit || Model.InvoiceItems.AllKnownFeePzns.Contains(x.PZN)).OrderBy(y => y.PZN))
+                {
+                <tr>
+                    <td></td>
+                    <td>
+                        @article.DisplayName
+                    </td>
+                    <td>
+                        @article.Price.ToString("0.00 €")
+                    </td>
+                    <td></td>
+                    <td>
+                        @article.TotalPrice.ToString("0.00 €")
+                    </td>
+                    <td></td>
+                </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>
+                            @Model.InvoiceItems.Items.Where(x => x.PZN >= Model.InvoiceItems.OrderItemPznLimit).Sum(y => y.Quantity)
+                        </strong>
+                    </td>
+                    <td>
+                        <strong>
+                            @Model.InvoiceItems.Items.Sum(y => y.TotalPrice).ToString("0.00 €")
+                        </strong>
+                    </td>
+                    <td>
+                        <strong>
+                            @Model.InvoiceItems.Items.Sum(y => y.PriceSavings).ToString("0.00 €")
+                        </strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+</div>
+@* ••••••••• Navigation ••••••••• *@
+<div class="row">
+    <div class="col-sm-12">
+        <a class="btn btn-primary btn-sm" role="button" asp-area="ServiceCenter" asp-action="DeliveryPayment"><i class="glyphicon glyphicon-arrow-left"></i></a>
+        <a class="btn btn-danger btn-sm" role="button" asp-area="ServiceCenter" asp-action="CustomerSearch"><i class="glyphicon glyphicon-remove"></i></a>
+        <div class="btn-toolbar" style="float:right">
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="Comment"><i class="glyphicon glyphicon-pencil"></i></a>
+            <a class="btn btn-success btn-sm @(ViewData.ModelState.ErrorCount != 0 ? "disabled" : "")" role="button" asp-area="ServiceCenter" asp-action="SendInvoice" asp-action-affliateId="@Model.Affiliate.AffiliateId" asp-action-customerId="@Model.BillingAddress.Id"><i class="glyphicon glyphicon-ok"></i></a>
+        </div>
+    </div>
+</div>

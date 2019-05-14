@@ -1,0 +1,132 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Comment
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<input id="affiliateId" type="hidden" value="@Model.AffiliateId">
+<input id="customerId" type="hidden" value="@Model.CustomerId">
+
+<br />
+
+<div id="errorMessage" class="alert alert-danger col-sm-12" role="alert" style="display:none">
+</div>
+
+@if (Model.InvoicePk == 0)
+{
+    <div id="errorMessage" class="alert alert-danger col-sm-12" role="alert">
+        @Localizer["CommentNotPossible"].Value
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="btn-toolbar">
+                <a class="btn btn-primary btn-sm" role="button" onclick="saveComment();history.go(-1)"><i class="glyphicon glyphicon-arrow-left"></i></a>
+            </div>
+        </div>
+        <div class="col-sm-6">
+        </div>
+    </div>
+}
+else
+{
+    <br />
+    @* ••••••••• Customer Details ••••••••• *@
+    <div class="row panel panel-info" style="padding:8px;background-color:@ViewData[string.Concat("AffiliateRgba", Model.Affiliate.AffiliateId)];">
+        @{await Html.RenderPartialAsync("CustomerDetailsPartial", Model); }
+    </div>
+    <hr />
+    @* ••••••••• Comment ••••••••• *@
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label for="comment">@Localizer["CommentTextArea"].Value</label>
+                <textarea class="form-control" rows="5" id="commentTextArea" maxlength="1000" onchange="enableSaveCommentButton()">@Model.CommentText</textarea>
+            </div>
+        </div>
+    </div>
+    @* ••••••••• Navigation ••••••••• *@
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="btn-toolbar">
+                <a class="btn btn-primary btn-sm" role="button" onclick="saveComment();history.go(-1)"><i class="glyphicon glyphicon-arrow-left"></i></a>
+                <button id="saveCommentButton" class="btn btn-sm btn-success" disabled="disabled" style="display:none">
+                    <i id="saveCommentAddressButtonIcon" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="btn-toolbar" style="float:right">
+                <a class="btn btn-danger btn-sm" role="button" asp-area="ServiceCenter" asp-action="CustomerSearch"><i class="glyphicon glyphicon-remove"></i></a>
+                <a class="btn btn-success btn-sm" role="button" onclick="saveComment()" asp-area="ServiceCenter" asp-action="SendCustomerComment" asp-action-affliateId="@Model.Affiliate.AffiliateId" asp-action-customerId="@Model.BillingAddress.Id"><i class="glyphicon glyphicon-ok"></i></a>
+            </div>
+        </div>
+    </div>
+}
+@section scripts {
+    <script type="text/javascript">
+
+        /* Comment */
+
+        $('#commentTextArea').change(function (e) { enableSaveCommentButton() });
+        $('#commentTextArea').keypress(function (e) { if (e.keyCode == 13) { saveComment(); } });
+
+        $('#saveCommentButton').bind("enterKey", function (e) { saveComment(); });
+        $('#saveCommentButton').click(function (e) { saveComment(); });
+
+        function enableSaveCommentButton() {
+            $('#saveCommentButton').removeClass("disabled");
+            $('#saveCommentButton').removeAttr('disabled', 'disabled');
+
+            $('#saveCommentButton').fadeIn();
+
+            $("#saveCommentButtonIcon").removeClass();
+            $("#saveCommentButtonIcon").addClass("glyphicon");
+            $("#saveCommentButtonIcon").addClass("glyphicon-floppy-save");
+        };
+
+        function saveComment() {
+            try {
+
+                var data = {
+                    __RequestVerificationToken: gettoken(), 
+                    customerId: $('#customerId').val(),
+                    commentText: $('#commentTextArea').val()
+                }
+
+                $.ajax({
+                    url: "@Url.Action("SetCustomerComment", "Order")",
+                    traditional: true,
+                    data: data,
+                    type: 'POST',
+                    dataType: 'text'
+
+                })
+                    .then(function (result) {
+                        if (result == "true") {
+                            $("#saveCommentButtonIcon").removeClass();
+                            $("#saveCommentButtonIcon").addClass("glyphicon");
+                            $("#saveCommentButtonIcon").addClass("glyphicon-floppy-saved");
+                            $('#saveCommentButton').fadeIn(1000);
+                            $('#saveCommentButton').fadeOut(2500);
+                        }
+                        else {
+                            $('#errorMessage').html("@Localizer["AjaxFail"].Value");
+                            $('#errorMessage').fadeIn();
+                        }
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* -------------------- */
+
+    </script>
+}

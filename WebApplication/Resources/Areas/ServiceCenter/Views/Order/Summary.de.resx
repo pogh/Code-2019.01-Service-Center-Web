@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountOwner" xml:space="preserve">
+    <value>Kontoinhaber</value>
+    <comment>AccountOwner</comment>
+  </data>
+  <data name="AT" xml:space="preserve">
+    <value>Österreich</value>
+    <comment>AT</comment>
+  </data>
+  <data name="Customer" xml:space="preserve">
+    <value>Kunde</value>
+    <comment>Customer</comment>
+  </data>
+  <data name="CustomerAddress" xml:space="preserve">
+    <value>Adresse</value>
+    <comment>Address</comment>
+  </data>
+  <data name="CustomerEmail" xml:space="preserve">
+    <value>Email</value>
+    <comment>Email</comment>
+  </data>
+  <data name="CustomerGroup" xml:space="preserve">
+    <value>Kundengruppe</value>
+    <comment>CustomerGroup</comment>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>Name</value>
+    <comment>Name</comment>
+  </data>
+  <data name="DE" xml:space="preserve">
+    <value>Deutschland</value>
+    <comment>DE</comment>
+  </data>
+  <data name="Delivery" xml:space="preserve">
+    <value>Lieferung</value>
+    <comment>Delivery</comment>
+  </data>
+  <data name="DeliveryAddress" xml:space="preserve">
+    <value>Lieferadresse</value>
+    <comment>Delivery Address</comment>
+  </data>
+  <data name="DeliveryAddressAddress" xml:space="preserve">
+    <value>Adresse</value>
+    <comment>Adresse</comment>
+  </data>
+  <data name="DeliveryAddressCity" xml:space="preserve">
+    <value>Stadt</value>
+    <comment>City</comment>
+  </data>
+  <data name="DeliveryAddressCountry" xml:space="preserve">
+    <value>Land</value>
+    <comment>Country</comment>
+  </data>
+  <data name="DeliveryAddressFirstName" xml:space="preserve">
+    <value>Vorname</value>
+    <comment>First Name</comment>
+  </data>
+  <data name="DeliveryAddressLastName" xml:space="preserve">
+    <value>Name</value>
+    <comment>Last Name</comment>
+  </data>
+  <data name="DeliveryAddressStreet" xml:space="preserve">
+    <value>Straße</value>
+    <comment>Street</comment>
+  </data>
+  <data name="DeliveryAddressTitle" xml:space="preserve">
+    <value>Anrede</value>
+    <comment>Title</comment>
+  </data>
+  <data name="DeliveryAddressZip" xml:space="preserve">
+    <value>PLZ</value>
+    <comment>Zip</comment>
+  </data>
+  <data name="DeliveryType" xml:space="preserve">
+    <value>Lieferart</value>
+    <comment>DeliveryType</comment>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>Artikel</value>
+    <comment>Items</comment>
+  </data>
+  <data name="Lastschrift" xml:space="preserve">
+    <value>Lastschrift</value>
+    <comment>SELECT * FROM dbo.Zahlungsweise</comment>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>Zahlung</value>
+    <comment>Payment</comment>
+  </data>
+  <data name="PaymentType" xml:space="preserve">
+    <value>Zahlungsart</value>
+    <comment>PaymentType</comment>
+  </data>
+  <data name="Rechnung" xml:space="preserve">
+    <value>Rechnung</value>
+    <comment>SELECT * FROM dbo.Zahlungsweise</comment>
+  </data>
+  <data name="Vorkasse" xml:space="preserve">
+    <value>Vorkasse</value>
+    <comment>SELECT * FROM dbo.Zahlungsweise</comment>
+  </data>
+  <data name="AdditionalLine" xml:space="preserve">
+    <value>Zusatz</value>
+    <comment>AdditionalLine</comment>
+  </data>
+  <data name="DeliveryAddressCompanyName" xml:space="preserve">
+    <value>Firmenname</value>
+    <comment>DeliveryAddressCompanyName</comment>
+  </data>
+  <data name="1001" xml:space="preserve">
+    <value>Beleg nicht gefunden</value>
+    <comment>Invoice Not Found</comment>
+  </data>
+  <data name="2001" xml:space="preserve">
+    <value>Kunde fehlt</value>
+    <comment>Customer missing</comment>
+  </data>
+  <data name="4001" xml:space="preserve">
+    <value>Zahlungsart fehlt</value>
+    <comment>Payment type missing</comment>
+  </data>
+  <data name="5001" xml:space="preserve">
+    <value>Lieferart fehlt</value>
+    <comment>Delivery type missing</comment>
+  </data>
+  <data name="6001" xml:space="preserve">
+    <value>Keine Bestellartikeln</value>
+    <comment>No order items</comment>
+  </data>
+  <data name="3002" xml:space="preserve">
+    <value>Name bei Lieferadresse fehlt</value>
+    <comment>Delivery address name missing</comment>
+  </data>
+  <data name="3003" xml:space="preserve">
+    <value>Straße bei Lieferadresse fehlt</value>
+    <comment>Delivery address street missing</comment>
+  </data>
+  <data name="3004" xml:space="preserve">
+    <value>Ort bei Lieferadresse fehlt</value>
+    <comment>Delivery address city missing</comment>
+  </data>
+  <data name="3005" xml:space="preserve">
+    <value>PLZ bei Lieferadresse fehlt</value>
+    <comment>Delivery address ZIP missing</comment>
+  </data>
+  <data name="3006" xml:space="preserve">
+    <value>Land bei Lieferadresse fehlt</value>
+    <comment>Delivery address Land missing</comment>
+  </data>
+  <data name="6002" xml:space="preserve">
+    <value>Bestellung weniger als 0 €</value>
+    <comment>Order total less than zero</comment>
+  </data>
+  <data name="ItemsName" xml:space="preserve">
+    <value>Name</value>
+    <comment>Name</comment>
+  </data>
+  <data name="ItemsPrice" xml:space="preserve">
+    <value>Preis</value>
+    <comment>Price</comment>
+  </data>
+  <data name="ItemsPriceSavings" xml:space="preserve">
+    <value>Ersparnis</value>
+    <comment>Price Savings</comment>
+  </data>
+  <data name="ItemsPzn" xml:space="preserve">
+    <value>PZN</value>
+    <comment>PZN</comment>
+  </data>
+  <data name="ItemsQuantity" xml:space="preserve">
+    <value>Anzahl</value>
+    <comment>Quantity</comment>
+  </data>
+  <data name="ItemsTotalPrice" xml:space="preserve">
+    <value>Summe</value>
+    <comment>Total Price</comment>
+  </data>
+  <data name="2003" xml:space="preserve">
+    <value>Name bei Rechnungsadresse fehlt</value>
+    <comment>Billing address name missing</comment>
+  </data>
+  <data name="2004" xml:space="preserve">
+    <value>Straße bei Rechnungsadresse fehlt</value>
+    <comment>Billing address street missing</comment>
+  </data>
+  <data name="2005" xml:space="preserve">
+    <value>Stadt bei Rechnungsadresse fehlt</value>
+    <comment>Billing city street missing</comment>
+  </data>
+  <data name="2006" xml:space="preserve">
+    <value>PLZ bei Rechnungsadresse fehlt</value>
+    <comment>Billing zip street missing</comment>
+  </data>
+  <data name="2002" xml:space="preserve">
+    <value>Keine Rechnungsadresse</value>
+    <comment>No billing address</comment>
+  </data>
+  <data name="3001" xml:space="preserve">
+    <value>Keine Lieferadresse</value>
+    <comment>No delivery address</comment>
+  </data>
+  <data name="4002" xml:space="preserve">
+    <value>Bankkontodaten fehlen</value>
+    <comment>Bank details missing</comment>
+  </data>
+  <data name="CustomerNumber" xml:space="preserve">
+    <value>Kundennummer</value>
+    <comment>Customer Number</comment>
+  </data>
+</root>

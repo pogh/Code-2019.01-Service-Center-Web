@@ -1,0 +1,126 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Objects.InvoiceItems
+
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<div id="invoiceItems">
+    <table class="table table-condensed table-bordered">
+        <thead>
+            <tr class="bg-info">
+                <th>
+                    @Localizer["Pzn"].Value
+                </th>
+                <th>
+                    @Localizer["Name"].Value
+                </th>
+                <th style="width:75px;">
+                    @Localizer["Amount"].Value
+                </th>
+                <th style="width:75px">
+                    @Localizer["VAT"].Value
+                </th>
+                <th style="width:75px">
+                    @Localizer["Price"].Value
+                </th>
+                <th style="width:75px">
+                    @Localizer["Quantity"].Value
+                </th>
+                <th style="width:75px">
+                    @Localizer["TotalPrice"].Value
+                </th>
+                <th style="width:75px">
+                    @Localizer["PriceSavings"].Value
+                </th>
+                <th style="width:75px">
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Items
+          .OrderByDescending(x => x.PZN >= Model.OrderItemPznLimit && !Model.AllKnownFeePzns.Contains(x.PZN))
+          .ThenBy(y => y.InvoiceItemId))
+            {
+                <tr>
+                    <td>
+                        @if (@article.PZN >= Model.OrderItemPznLimit && !Model.AllKnownFeePzns.Contains(article.PZN))
+                        {
+                            @article.PZN.ToString(Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Invoice.PZNStringFormat)
+                        }
+                    </td>
+                    <td>
+                        @article.DisplayName
+                    </td>
+                    <td>
+                        @article.Amount
+                    </td>
+                    <td>
+                        @article.VAT.ToString("0.0") @System.Globalization.CultureInfo.CurrentUICulture.NumberFormat.PercentSymbol
+                    </td>
+                    <td>
+                        @article.Price.ToString("0.00 €")
+                    </td>
+                    <td>
+                        @if (@article.PZN >= Model.OrderItemPznLimit && !Model.AllKnownFeePzns.Contains(article.PZN))
+                        {
+                            <input class="form-control" type="number" size="1" id="@string.Concat("quantity", article.InvoiceItemId)" value="@article.Quantity" onchange="updateInvoiceItemQuantity(@article.InvoiceItemId, this.value);" />
+
+                        }
+                        else
+                        {
+                            @article.Quantity
+                        }
+                    </td>
+                    <td>
+                        @article.TotalPrice.ToString("0.00 €")
+                    </td>
+                    <td>
+                        @if (@article.PZN >= Model.OrderItemPznLimit && !Model.AllKnownFeePzns.Contains(article.PZN))
+                        {
+                            @article.TotalSaving.ToString("0.00 €")
+                        }
+                    </td>
+                    <td style="width:130px">
+                        <button id="@(string.Concat("removeItem", article.InvoiceItemId))" class="btn btn-sm btn-primary" onclick="removeInvoiceItem(@article.InvoiceItemId)">
+                            <i id="removeItemButtonIcon" class="glyphicon glyphicon-trash"></i>
+                        </button>
+                        <button id="@(string.Concat("decreaseItem", article.InvoiceItemId))" class="btn btn-sm btn-primary" onclick="decrementInvoiceItem(@article.InvoiceItemId)">
+                            <i id="decreaseItemButtonIcon" class="glyphicon glyphicon-minus"></i>
+                        </button>
+                        <button id="@(string.Concat("increaseItem", article.InvoiceItemId))" class="btn btn-sm btn-primary" onclick="incrementInvoiceItem(@article.InvoiceItemId)" disabled="@(article.PZN < Model.OrderItemPznLimit || Model.AllKnownFeePzns.Contains(article.PZN))">
+                            <i id="increaseItemButtonIcon" class="glyphicon glyphicon-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="bg-info">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <strong>
+                        @Model.Items.Where(x => x.PZN >= Model.OrderItemPznLimit).Sum(y => y.Quantity)
+                    </strong>
+                </td>
+                <td>
+                    <strong>
+                        @Model.Items.Sum(y => y.TotalPrice).ToString("0.00 €")
+                    </strong>
+                </td>
+                <td>
+                    <strong>
+                        @Model.Items.Sum(y => y.TotalSaving).ToString("0.00 €")
+                    </strong>
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+

@@ -1,0 +1,101 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.PartialViews.CustomerSearchResults
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<div id="searchResult">
+    @if (Model.NoResults)
+    {
+        <br />
+        @if (Context.User.IsInRole("APO-SG-Entwicklung"))
+        {
+            <div class="col-sm-12">
+                <p class="text-muted pull-right small">@ViewData["QueryRunTime"]</p>
+            </div>
+            <br />
+        }
+        <div class="col-sm-12">
+            <div class="alert alert-info col-sm-12" role="alert">
+                @Localizer["NoResults"].Value
+            </div>
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th>
+                        @Localizer["Number"].Value
+                    </th>
+                    <th>
+                        @Localizer["FullName"].Value
+                    </th>
+                    <th>
+                        @Localizer["DoB"].Value
+                    </th>
+                    <th>
+                        @Localizer["Address"].Value
+                    </th>
+                    <th>
+                        @Localizer["Affiliate"].Value
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var customer in Model.Customers)
+                {
+                    <tr style="background-color:@ViewData[string.Concat("AffiliateRgba", customer.AffiliateId)];">
+                        <td>
+                            <a class="btn btn-primary btn-xs" role="button" asp-area="ServiceCenter" asp-action="StartCustomerEdit" asp-route-affiliateId="@customer.AffiliateId" asp-route-kundenNr="@customer.Id"><i class="glyphicon glyphicon-user"></i></a>
+                        </td>
+                        <td>
+                            @customer.CustomerNumber
+                        </td>
+                        <td>
+                            @customer.FullName
+                        </td>
+                        <td>
+                            @if (customer.DoB.HasValue 
+                              && customer.DoB.Value != DateTime.MinValue)
+                            {
+                                @customer.DoB.Value.ToShortDateString();
+                            }
+                        </td>
+                        <td>
+                            @customer.FullAddress
+                        </td>
+                        <td>
+                            @customer.AffiliateKey
+                        </td>
+                        <td>
+                            <a class="btn btn-success btn-xs" role="button" asp-area="ServiceCenter" asp-action="StartComment" asp-route-affiliateId="@customer.AffiliateId" asp-route-kundenNr="@customer.Id"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a class="btn btn-success btn-xs" role="button" asp-area="ServiceCenter" asp-action="StartInvoice" asp-route-affiliateId="@customer.AffiliateId" asp-route-kundenNr="@customer.Id"><i class="glyphicon glyphicon-arrow-right"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @if (Context.User.IsInRole("APO-SG-Entwicklung"))
+        {
+            <div class="col-sm-12">
+                <p class="text-muted pull-right small">@ViewData["QueryRunTime"]</p>
+            </div>
+        }
+        @if (Model.ToManyResults)
+        {
+            <div class="col-sm-12">
+                <div class="alert alert-danger col-sm-12" role="alert">
+                    @Localizer["TooManyResults"].Value
+                </div>
+            </div>
+        }
+    }
+</div>
+

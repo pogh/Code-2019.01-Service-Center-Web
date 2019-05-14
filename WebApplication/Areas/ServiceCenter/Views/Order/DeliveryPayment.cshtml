@@ -1,0 +1,642 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.DeliveryPayment
+
+@using Company.WebApplication.Areas.ServiceCenter.Models.Order.Objects
+@using Company.WebApplication.Areas.ServiceCenter.Models.Order.PartialViews
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<input id="affiliateId" type="hidden" value="@Model.AffiliateId">
+<input id="customerId" type="hidden" value="@Model.CustomerId">
+
+<br />
+
+<div id="errorMessage" class="alert alert-danger col-sm-12" role="alert" style="display:none">
+</div>
+
+<br />
+@* ••••••••• Customer Details ••••••••• *@
+<div class="row panel panel-info" style="padding:8px;background-color:@ViewData[string.Concat("AffiliateRgba", Model.Affiliate.AffiliateId)];">
+    @{await Html.RenderPartialAsync("CustomerDetailsPartial", Model); }
+</div>
+@* ••••••••• Address ••••••••• *@
+<div class="row">
+    <div class="col-sm-6">
+        <div class="btn-block btn-group-vertical" data-toggle="buttons">
+            @foreach (Company.BusinessObjects.Common.DeliveryAddress address in Model.DeliveryAddresses)
+            {
+                <label type="button" class="btn btn-primary" onclick="deliveryAddressClicked('@(string.IsNullOrEmpty(address.Title) ? string.Empty : address.Title.Replace("'", "\'"))', '@(string.IsNullOrEmpty(address.FirstName) ? string.Empty : address.FirstName.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.LastName) ? string.Empty : address.LastName.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.CompanyName) ? string.Empty : address.CompanyName.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.Street) ? string.Empty : address.Street.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.Zip) ? string.Empty : address.Zip.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.City) ? string.Empty : address.City.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.Country) ? string.Empty : address.Country.Replace("'", "\'"))', '@(string.IsNullOrEmpty(@address.AdditionalLine) ? string.Empty : address.AdditionalLine.Replace("'", "\'"))')">
+                    @address.ToString()
+                </label>
+            }
+            <label type="button" class="btn btn-primary" onclick="deliveryAddressClicked()">
+                @Localizer["DeliveryAddress"].Value
+            </label>
+        </div>
+        <br />
+        <div id="deliveryAddressDiv" class="form-group">
+            <br />
+            <div class="row btn-group-vertical">
+                <div class="col">
+                    <label>@Localizer["DeliveryAddress"]</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <select type="text" class="form-control" id="newDeliveryAddressTitle" placeholder="@Localizer["DeliveryAddressTitle"].Value" onchange="enableSaveNewDeliveryAddressButton()">
+                        <option value=""></option>
+                        <option value="Dr." selected="@(Model.DeliveryAddress.Title == "Dr.")">Dr.</option>
+                        <option value="Firma" selected="@(Model.DeliveryAddress.Title == "Firma")">Firma</option>
+                        <option value="Frau" selected="@(Model.DeliveryAddress.Title == "Frau")">Frau</option>
+                        <option value="Herr" selected="@(Model.DeliveryAddress.Title == "Herr")">Herr</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAddressFirstName" placeholder="@Localizer["DeliveryAddressFirstName"].Value" value="@Model.DeliveryAddress.FirstName">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAddressLastName" placeholder="@Localizer["DeliveryAddressLastName"].Value" onchange="enableSaveNewDeliveryAddressButton()" value="@Model.DeliveryAddress.LastName">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAddressCompanyName" placeholder="@Localizer["DeliveryAddressCompanyName"].Value" onchange="enableSaveNewDeliveryAddressButton()" value="@Model.DeliveryAddress.CompanyName">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAddressStreet" placeholder="@Localizer["DeliveryAddressStreet"].Value" onchange="enableSaveNewDeliveryAddressButton(); getBestGuestCityFromZip();" value="@Model.DeliveryAddress.Street">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAddressZip" placeholder="@Localizer["DeliveryAddressZip"].Value" onchange="enableSaveNewDeliveryAddressButton(); getBestGuestCityFromZip();" value="@Model.DeliveryAddress.Zip">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAddressCity" placeholder="@Localizer["DeliveryAddressCity"].Value" onchange="enableSaveNewDeliveryAddressButton()" value="@Model.DeliveryAddress.City">
+                </div>
+                <div class="col">
+                    <select type="text" class="form-control" id="newDeliveryAddressCountry" placeholder="@Localizer["DeliveryCountry"].Value" onchange="enableSaveNewDeliveryAddressButton()">
+                        <option value=""></option>
+                        @{
+                            foreach (Company.BusinessObjects.Common.CountryKey countryKey in Enum.GetValues(typeof(Company.BusinessObjects.Common.CountryKey)))
+                            {
+                                string countryKeyString = System.Convert.ToString(countryKey);
+
+                                <option value="@countryKeyString" selected="@(Model.DeliveryAddress.Country == countryKeyString)">@Localizer[countryKeyString].Value</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="newDeliveryAdditionalLine" placeholder="@Localizer["AdditionalLine"].Value" onchange="enableSaveNewDeliveryAddressButton()" value="@Model.DeliveryAddress.AdditionalLine">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button id="saveNewDeliveryAddressButton" class="btn btn-success pull-right" disabled="disabled" style="display:none">
+                    <i id="saveNewDeliveryAddressButtonIcon" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+            </div>
+            <div class="cell">
+                <button id="saveNewDeliveryAddressButtonPlaceHolder" class="btn btn-success" disabled="disabled" style="visibility:hidden">
+                    <i id="saveNewDeliveryAddressButtonIconPlaceHolder" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-1">
+    </div>
+    @* ••••••••• Payment Types ••••••••• *@
+    <div class="col-sm-5">
+        <div class="row">
+            <div class="col">
+                <div id="paymentTypesDiv" class="btn-group" data-toggle="buttons">
+                    @foreach (PaymentType paymentType in Model.PaymentTypes)
+                    {
+                        <label type="button" class="btn btn-primary @(Model.PaymentTypeId == paymentType.PaymentTypeId?"active":"")" onchange="savePaymentType()">
+                            <input type="radio" name="paymentTypeOptions" id="@string.Concat("paymentType", paymentType.PaymentTypeId)" checked="@(Model.PaymentTypeId == paymentType.PaymentTypeId)" value="@paymentType.PaymentTypeId">
+                            @Localizer[paymentType.PaymentTypeName].Value
+                        </label>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <br />
+            <div id="bankAccountDiv" class="form-group" style="@(Model.PaymentTypeId == 5 ? "display:block" : "display:none")">
+                <div class="col">
+                    <input type="text" class="form-control" id="iban" placeholder="@Localizer["IBAN"].Value" onchange="enableSaveNewPaymentTypeButton()" value="@Model.Iban">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="bic" placeholder="@Localizer["BIC"].Value" onchange="enableSaveNewPaymentTypeButton()" value="@Model.Bic">
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="accountOwner" placeholder="@Localizer["AccountOwner"].Value" onchange="enableSaveNewPaymentTypeButton()" value="@Model.AccountOwner">
+                        <span class="input-group-btn" onclick="getBankAccountDetails()">
+                            <button class="btn btn-primary glyphicon glyphicon-plus" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button id="saveNewPaymentTypeButton" class="btn btn-success pull-right" disabled="disabled" style="display:none">
+                    <i id="saveNewPaymentTypeButtonIcon" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+            </div>
+            <div class="cell">
+                <button id="saveNewPaymentTypeButtonPlaceHolder" class="btn btn-success" disabled="disabled" style="visibility:hidden">
+                    <i id="saveNewPaymentTypeButtonIconPlaceHolder" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+            </div>
+        </div>
+        @* ••••••••• Delivery Types ••••••••• *@
+        <div class="row">
+            <div id="deliveryTypesDiv" class="btn-group" data-toggle="buttons">
+                @{
+                    if (Model.DeliveryTypeId.HasValue)
+                    {
+                        DeliveryTypesPartial deliveryTypesPartialModel = new DeliveryTypesPartial();
+                        deliveryTypesPartialModel.DeliveryTypes.AddRange(Model.DeliveryTypes);
+                        deliveryTypesPartialModel.OrderTotal = Model.InvoiceItems.OrderItemsTotal;
+                        deliveryTypesPartialModel.SelectedDeliveryTypeId = Model.DeliveryTypeId.Value;
+                        await Html.RenderPartialAsync("DeliveryPaymentDeliveryTypes", deliveryTypesPartialModel);
+                    }
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <br />
+                <button id="saveNewDeliveryTypeButton" class="btn btn-success pull-right" disabled="disabled" style="display:none">
+                    <i id="saveNewDeliveryTypeButtonIcon" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+            </div>
+            <div class="cell">
+                <br />
+                <button id="saveNewDeliveryTypeButtonPlaceHolder" class="btn btn-success" disabled="disabled" style="visibility:hidden">
+                    <i id="saveNewDeliveryTypeButtonIconPlaceHolder" class="glyphicon glyphicon-floppy-save"></i>
+                </button>
+            </div>
+        </div>
+        @* ••••••••• DeliveryPaymentButtons ••••••••• *@
+        @if (Model.DeliveryPaymentButtons.Count > 0)
+        {
+            <div class="row">
+                <div id="discountsDiv" class="btn-block">
+                    @foreach (DeliveryPaymentButton dpb in Model.DeliveryPaymentButtons.OrderBy(x => x.DeliveryPaymentButtonId))
+                    {
+                        if (Model.InvoiceItems.OrderItemsTotal > dpb.DisplayFromTotal)
+                        {
+                            <label type="button" class="btn btn-primary" onclick="addDeliveryPaymentButtonItem(@dpb.DeliveryPaymentButtonId)">
+                                @Localizer[dpb.DisplayText].Value
+                                <text>(</text>
+                                @if (@dpb.Pzn == DeliveryPaymentButton.DISCOUNT_PZN)
+                                {
+                                    @dpb.ItemPrice.ToString("0")<text>%</text>
+                                }
+                                else
+                                {
+                                    @dpb.ItemPrice.ToString("0.00 €")
+                                }
+                                <text>)</text>
+                            </label>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <br />
+                    <button id="saveDiscountButton" class="btn btn-success pull-right" disabled="disabled" style="display:none">
+                        <i id="saveDiscountButtonIcon" class="glyphicon glyphicon-floppy-save"></i>
+                    </button>
+                </div>
+                <div class="cell">
+                    <br />
+                    <button id="saveDiscountButtonPlaceHolder" class="btn btn-success" disabled="disabled" style="visibility:hidden">
+                        <i id="saveDiscountButtonIconPlaceHolder" class="glyphicon glyphicon-floppy-save"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        @* ••••••••• Order Summary ••••••••• *@
+        <div class="row">
+            <div id="paymentSummaryDiv">
+                @{ await Html.RenderPartialAsync("DeliveryPaymentSummary", Model.InvoiceItems); }
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+@* ••••••••• Navigation ••••••••• *@
+<div class="row">
+    <div class="col-sm-12">
+        <a class="btn btn-primary btn-sm" role="button" asp-area="ServiceCenter" asp-action="Invoice"><i class="glyphicon glyphicon-arrow-left"></i></a>
+        <a class="btn btn-danger btn-sm" role="button" asp-area="ServiceCenter" asp-action="CustomerSearch"><i class="glyphicon glyphicon-remove"></i></a>
+        <div class="btn-toolbar" style="float:right">
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="Comment"><i class="glyphicon glyphicon-pencil"></i></a>
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="Summary"><i class="glyphicon glyphicon-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script type="text/javascript">
+
+        /* New Delivery Address */
+
+        $('#newDeliveryAddressTitle').change(function (e) { saveNewDeliveryAddress(); });
+
+        $('#newDeliveryAddressFirstName').change(function (e) { enableSaveNewDeliveryAddressButton() });
+        $('#newDeliveryAddressFirstName').keypress(function (e) { if (e.keyCode == 13) { saveNewDeliveryAddress(); } });
+
+        $('#newDeliveryAddressLastName').change(function (e) { enableSaveNewDeliveryAddressButton() });
+        $('#newDeliveryAddressLastName').keypress(function (e) { if (e.keyCode == 13) { saveNewDeliveryAddress(); } });
+
+        $('#newDeliveryAddressStreet').change(function (e) { enableSaveNewDeliveryAddressButton() });
+        $('#newDeliveryAddressStreet').keypress(function (e) { if (e.keyCode == 13) { saveNewDeliveryAddress(); } });
+
+        $('#newDeliveryAddressZip').change(function (e) { enableSaveNewDeliveryAddressButton() });
+        $('#newDeliveryAddressZip').keypress(function (e) { if (e.keyCode == 13) { saveNewDeliveryAddress(); } });
+
+        $('#newDeliveryAddressCity').change(function (e) { enableSaveNewDeliveryAddressButton() });
+        $('#newDeliveryAddressCity').keypress(function (e) { if (e.keyCode == 13) { saveNewDeliveryAddress(); } });
+
+        $('#newDeliveryAddressCountry').change(function (e) { saveNewDeliveryAddress(); });
+
+        $('#newDeliveryAdditionalLine').change(function (e) { enableSaveNewDeliveryAddressButton() });
+        $('#newDeliveryAdditionalLine').keypress(function (e) { if (e.keyCode == 13) { saveNewDeliveryAddress(); } });
+
+        $('#saveNewDeliveryAddressButton').bind("enterKey", function (e) { saveNewDeliveryAddress(); });
+        $('#saveNewDeliveryAddressButton').click(function (e) { saveNewDeliveryAddress(); });
+
+
+        function enableSaveNewDeliveryAddressButton() {
+            $('#saveNewDeliveryAddressButton').removeClass("disabled");
+            $('#saveNewDeliveryAddressButton').removeAttr('disabled', 'disabled');
+
+            $('#saveNewDeliveryAddressButton').fadeIn();
+
+            $("#saveNewDeliveryAddressButtonIcon").removeClass();
+            $("#saveNewDeliveryAddressButtonIcon").addClass("glyphicon");
+            $("#saveNewDeliveryAddressButtonIcon").addClass("glyphicon-floppy-save");
+        };
+
+        function deliveryAddressClicked(title, firstName, lastName, companyName, street, zip, city, country, additionalLine) {
+
+            enableSaveNewDeliveryAddressButton();
+
+            $('#newDeliveryAddressTitle').val(title);
+            $('#newDeliveryAddressFirstName').val(firstName);
+            $('#newDeliveryAddressLastName').val(lastName);
+            $('#newDeliveryAddressCompanyName').val(companyName);
+            $('#newDeliveryAddressStreet').val(street);
+            $('#newDeliveryAddressZip').val(zip);
+            $('#newDeliveryAddressCity').val(city);
+            $('#newDeliveryAddressCountry').val(country);
+            $('#newDeliveryAdditionalLine').val(additionalLine);
+
+            saveNewDeliveryAddress();
+        }
+
+        function saveNewDeliveryAddress() {
+            try {
+
+                var data = {
+                    __RequestVerificationToken: gettoken(),
+                    affiliateId: $('#affiliateId').val(),
+                    customerId: $('#customerId').val(),
+                    title: $('#newDeliveryAddressTitle').val(),
+                    firstName: $('#newDeliveryAddressFirstName').val(),
+                    lastName: $('#newDeliveryAddressLastName').val(),
+                    companyName: $('#newDeliveryAddressCompanyName').val(),
+                    street: $('#newDeliveryAddressStreet').val(),
+                    zip: $('#newDeliveryAddressZip').val(),
+                    city: $('#newDeliveryAddressCity').val(),
+                    country: $('#newDeliveryAddressCountry').val(),
+                    AdditionalLine: $('#newDeliveryAdditionalLine').val()
+                };
+
+                $.ajax({
+                    url: "@Url.Action("UpdateDeliveryAddress", "Order")",
+                    traditional: true,
+                    data: data,
+                    type: 'POST',
+                    dataType: 'text'
+
+                })
+                    .then(function (result) {
+                        if (result > 0) {
+                            $("#saveNewDeliveryAddressButtonIcon").removeClass();
+                            $("#saveNewDeliveryAddressButtonIcon").addClass("glyphicon");
+                            $("#saveNewDeliveryAddressButtonIcon").addClass("glyphicon-floppy-saved");
+                            $('#saveNewDeliveryAddressButton').fadeIn(1000);
+                            $('#saveNewDeliveryAddressButton').fadeOut(2500);
+
+                            if (result == 2) {
+                                $.ajax({
+                                    url: "@Url.Action("GetDeliveryAddressStreet", "Order")",
+                                    traditional: true,
+                                    data: {
+                                        affiliateId: $('#affiliateId').val(),
+                                        customerId: $('#customerId').val()
+                                    },
+                                    type: 'GET',
+                                    dataType: 'text'
+                                    })
+                                    .then(function (result) {
+                                        $('#newDeliveryAddressStreet').animate({ backgroundColor: '#449d44' }, 1000).val(result).animate({ backgroundColor: '#FFFFFF' }, 5000);
+                                    })
+                                    .fail(function (xhr, status, error) {
+                                        $('#errorMessage').html(status + ': ' + error);
+                                        $('#errorMessage').fadeIn();
+                                    });
+                            }
+                        }
+                        else {
+                            $('#errorMessage').html("@Localizer["AjaxFail"].Value");
+                            $('#errorMessage').fadeIn();
+                        }
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Payment Type */
+
+        $('#bic').change(function (e) { enableSaveNewPaymentTypeButton() });
+        $('#bic').keypress(function (e) { if (e.keyCode == 13) { savePaymentType(); } });
+
+        $('#iban').change(function (e) { enableSaveNewPaymentTypeButton() });
+        $('#iban').keypress(function (e) { if (e.keyCode == 13) { savePaymentType(); } });
+
+        $('#accountOwner').change(function (e) { enableSaveNewPaymentTypeButton() });
+        $('#accountOwner').keypress(function (e) { if (e.keyCode == 13) { savePaymentType(); } });
+
+        $('#saveNewPaymentTypeButton').bind("enterKey", function (e) { savePaymentType });
+        $('#saveNewPaymentTypeButton').click(function (e) { savePaymentType(); });
+
+        function enableSaveNewPaymentTypeButton() {
+
+            $('#saveNewPaymentTypeButton').removeClass("disabled");
+            $('#saveNewPaymentTypeButton').removeAttr('disabled', 'disabled');
+
+            $('#saveNewPaymentTypeButton').fadeIn();
+
+            $("#saveNewPaymentTypeButtonIcon").removeClass();
+            $("#saveNewPaymentTypeButtonIcon").addClass("glyphicon");
+            $("#saveNewPaymentTypeButtonIcon").addClass("glyphicon-floppy-save");
+        };
+
+        function savePaymentType() {
+            try {
+                paymentTypeId = $("input:radio[name='paymentTypeOptions']:checked").val();
+
+                if (paymentTypeId == 5) {
+                    $('#bankAccountDiv').show();
+                }
+                else {
+                    $('#bankAccountDiv').hide();
+                }
+
+                $.ajax({
+                    url: "@Url.Action("UpdatePaymentType", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        paymentTypeId: paymentTypeId,
+                        selectedDeliveryTypeId: $("input:radio[name='deliveryTypeOptions']:checked").val(),
+                        orderItemsTotal: @Model.InvoiceItems.OrderItemsTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture),
+                        bic: $('#bic').val(),
+                        iban: $('#iban').val(),
+                        accountOwner: $('#accountOwner').val()
+                    },
+                    type: 'POST',
+                    dataType: 'text'
+
+                })
+                    .then(function (result) {
+                        $('#deliveryTypesDiv').html(result);
+
+                        $("#saveNewPaymentTypeButtonIcon").removeClass();
+                        $("#saveNewPaymentTypeButtonIcon").addClass("glyphicon");
+                        $("#saveNewPaymentTypeButtonIcon").addClass("glyphicon-floppy-saved");
+                        $('#saveNewPaymentTypeButton').fadeIn(1000);
+                        $('#saveNewPaymentTypeButton').fadeOut(2500);
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Delivery Type */
+
+        $('#saveNewDeliveryTypeButton').bind("enterKey", function (e) { savedeliveryType });
+        $('#saveNewDeliveryTypeButton').click(function (e) { savedeliveryType(); });
+
+        function enableSaveNewDeliveryTypeButton() {
+
+            $('#saveNewDeliveryTypeButton').removeClass("disabled");
+            $('#saveNewDeliveryTypeButton').removeAttr('disabled', 'disabled');
+
+            $('#saveNewDeliveryTypeButton').fadeIn();
+
+            $("#saveNewDeliveryTypeButtonIcon").removeClass();
+            $("#saveNewDeliveryTypeButtonIcon").addClass("glyphicon");
+            $("#saveNewDeliveryTypeButtonIcon").addClass("glyphicon-floppy-save");
+        };
+
+        function saveDeliveryType(deliveryTypeId, shippingCosts) {
+            try {
+
+                $.ajax({
+                    url: "@Url.Action("UpdateDeliveryType", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        deliveryTypeId: deliveryTypeId,
+                        shippingCosts: shippingCosts
+                    },
+                    type: 'POST',
+                    dataType: 'text'
+
+                })
+                    .then(function (result) {
+                        if (result == "true") {
+                            $("#saveNewDeliveryTypeButtonIcon").removeClass();
+                            $("#saveNewDeliveryTypeButtonIcon").addClass("glyphicon");
+                            $("#saveNewDeliveryTypeButtonIcon").addClass("glyphicon-floppy-saved");
+                            $('#saveNewDeliveryTypeButton').fadeIn(1000);
+                            $('#saveNewDeliveryTypeButton').fadeOut(2500);
+
+                            $.ajax({
+                                url: '@Url.Action("GetPaymentSummaryPartial", "Order")',
+                                data: {
+                                    affiliateId: $('#affiliateId').val(),
+                                    customerId: $('#customerId').val()
+                                },
+                                type: 'GET',
+                                dataType: 'html',
+                                success: function (result) {
+                                    $('#paymentSummaryDiv').html(result);
+                                }
+                            }).fail(function (xhr, status, error) {
+                                $('#errorMessage').html(status + ': ' + error);
+                                $('#errorMessage').fadeIn();
+                            });
+
+                        }
+                        else {
+                            $('#errorMessage').html("@Localizer["AjaxFail"].Value");
+                            $('#errorMessage').fadeIn();
+                        }
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Additional Special Items */
+        function addDeliveryPaymentButtonItem(deliveryPaymentButtonId) {
+            try {
+                $.ajax({
+                    url: "@Url.Action("AddDeliveryPaymentButtonItem", "Order")",
+                    traditional: true,
+                    data: {
+                        __RequestVerificationToken: gettoken(),
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val(),
+                        deliveryPaymentButtonId: deliveryPaymentButtonId
+                    },
+                    type: 'POST',
+                    dataType: 'html'
+
+                })
+                .then(function (result) {
+                    $('#paymentSummaryDiv').html(result)
+
+                    $("#saveDiscountButtonIcon").removeClass();
+                    $("#saveDiscountButtonIcon").addClass("glyphicon");
+                    $("#saveDiscountButtonIcon").addClass("glyphicon-floppy-saved");
+                    $('#saveDiscountButton').fadeIn(1000);
+                    $('#saveDiscountButton').fadeOut(2500);
+                })
+                .fail(function (xhr, status, error) {
+                    $('#errorMessage').html(status + ': ' + error);
+                    $('#errorMessage').fadeIn();
+                });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Bank Account */
+        function getBankAccountDetails() {
+            try {
+                $.ajax({
+                    url: "@Url.Action("GetBankAccountDetails", "Order")",
+                    traditional: true,
+                    data: {
+                        affiliateId: $('#affiliateId').val(),
+                        customerId: $('#customerId').val()
+                    },
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: "application/json"
+                })
+                    .then(function (result) {
+                        if (result != null) {
+                            $('#iban').val(result.iban);
+                            $('#bic').val(result.bic);
+                            $('#accountOwner').val(result.accountOwner);
+                            savePaymentType();
+                        }
+                })
+                .fail(function (xhr, status, error) {
+                    $('#errorMessage').html(status + ': ' + error);
+                    $('#errorMessage').fadeIn();
+                });
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+            }
+        }
+
+        /* Guess the city from zip and street */
+        function getBestGuestCityFromZip() {
+            try {
+
+                zip = $('#newDeliveryAddressZip').val();
+                street = $('#newDeliveryAddressStreet').val();
+
+                if (zip != '' && street != '') {
+                    $.ajax({
+                        url: "@Url.Action("GetBestGuestCityFromZip", "Order")",
+                        traditional: true,
+                        data: {
+                            zip: zip,
+                            street: street
+                        },
+                        type: 'GET',
+                        dataType: 'text',
+                        contentType: "application/json"
+                    })
+                        .then(function (result) {
+                            if (result != null) {
+                                if ($('#newDeliveryAddressCity').val() != result) {
+                                    $('#newDeliveryAddressCity').animate({ backgroundColor: '#449d44' }, 1000).val(result).animate({ backgroundColor: '#FFFFFF' }, 5000);
+                                }
+                            }
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#errorMessage').html(status + ': ' + error);
+                        $('#errorMessage').fadeIn();
+                    });
+                }
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+            }
+            finally {
+                }
+        }
+    </script>
+}

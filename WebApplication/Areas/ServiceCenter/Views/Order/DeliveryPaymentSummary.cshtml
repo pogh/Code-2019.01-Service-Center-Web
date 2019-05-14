@@ -1,0 +1,81 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Objects.InvoiceItems
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<div class="row alert alert-info">
+    <table class="col-xs-12">
+        <tbody>
+            <tr>
+                <td class="col-xs-8">
+                    @Localizer["OrderItemsTotal"].Value:
+                </td>
+                <td class="col-xs-4" style="text-align:right">
+                    @Model.OrderItemsTotal.ToString("0.00 €")
+                </td>
+            </tr>
+            <tr>
+                <td class="col-xs-8">
+                    @Localizer["ShippingCostsTotal"].Value:
+                </td>
+                <td class="col-xs-4" style="text-align:right">
+                    @Model.ShippingCostsTotal.ToString("0.00 €")
+                </td>
+            </tr>
+            @if (@Model.AdditionalFeesTotal != 0)
+            {
+                <tr>
+                    <td class="col-xs-8">
+                        @Localizer["AdditionalFeesTotal"].Value:
+                    </td>
+                    <td class="col-xs-4" style="text-align:right">
+                        @Model.AdditionalFeesTotal.ToString("0.00 €")
+                    </td>
+                </tr>
+            }
+            @if (@Model.DiscountsTotal != 0)
+            {
+                <tr>
+                    <td class="col-xs-8">
+                        @Localizer["DiscountsTotal"].Value:
+                    </td>
+                    <td class="col-xs-4" style="text-align:right">
+                        @Model.DiscountsTotal.ToString("0.00 €")
+                    </td>
+                </tr>
+            }
+            @if (@Model.CreditsTotal != 0)
+            {
+                <tr>
+                    <td class="col-xs-8">
+                        @Localizer["CreditsTotal"].Value:
+                    </td>
+                    <td class="col-xs-4" style="text-align:right">
+                        @Model.CreditsTotal.ToString("0.00 €")
+                    </td>
+                </tr>
+            }
+            @if (@Model.OthersTotal != 0)
+            {
+                <tr>
+                    <td class="col-xs-8">
+                        @Localizer["OthersTotal"].Value:
+                    </td>
+                    <td class="col-xs-4" style="text-align:right">
+                        @Model.OthersTotal.ToString("0.00 €")
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr style="border-top:double">
+                <td class="col-xs-8">
+                    @Localizer["GrandTotal"].Value:
+                </td>
+                <td class="col-xs-4" style="text-align:right">
+                    @Model.GrandTotal.ToString("0.00 €")
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

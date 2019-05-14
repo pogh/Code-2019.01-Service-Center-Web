@@ -1,0 +1,29 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Confirmation
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<input id="affiliateId" type="hidden" value="@Model.AffiliateId">
+<input id="customerId" type="hidden" value="@Model.CustomerId">
+
+<br />
+
+<div id="errorMessage" class="alert alert-danger col-sm-12" role="alert" style="display:none">
+</div>
+
+<br />
+@* ••••••••• Search ••••••••• *@
+<div class="alert alert-info" role="alert">
+    📦 @Localizer["ConfirmationText"]
+    <br />
+    @Localizer["ConfirmationNumber"]: @Model.InvoiceId
+</div>
+@* ••••••••• Navigation ••••••••• *@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="btn-toolbar" style="float:right">
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="Comment"><i class="glyphicon glyphicon-pencil"></i></a>
+            <a class="btn btn-success btn-sm" role="button" asp-area="ServiceCenter" asp-action="CustomerSearch"><i class="glyphicon glyphicon-arrow-right"></i></a>
+        </div>
+    </div>
+</div>

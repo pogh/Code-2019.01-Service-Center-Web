@@ -1,0 +1,26 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.PartialViews.DeliveryTypesPartial
+
+@using Company.WebApplication.Areas.ServiceCenter.Models.Order.Objects
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@foreach (DeliveryType deliveryType in Model.DeliveryTypes)
+{
+    <label type="button" class="btn btn-primary @(Model.SelectedDeliveryTypeId == deliveryType.DeliveryTypeId?"active":"")" onclick="saveDeliveryType(@deliveryType.DeliveryTypeId, @(Model.OrderTotal < deliveryType.ShippingLimits ? deliveryType.ShippingCosts.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "0.00"))">
+        <input type="radio" name="deliveryTypeOptions" id="@string.Concat("deliveryType", deliveryType.DeliveryTypeId)" value="@deliveryType.DeliveryTypeId" checked="@(Model.SelectedDeliveryTypeId == deliveryType.DeliveryTypeId)">
+        @Localizer[deliveryType.DeliveryTypeName].Value
+        @if (Model.OrderTotal < deliveryType.ShippingLimits)
+        {
+            <text>(</text>
+            @(deliveryType.ShippingCosts.ToString("0.00 €"));
+            <text>)</text>
+        }
+        else
+        {
+            <text>(</text>
+            @((0.00).ToString("0.00 €"));
+            <text>)</text>
+        }
+    </label>
+}

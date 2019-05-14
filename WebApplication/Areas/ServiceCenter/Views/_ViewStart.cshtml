@@ -1,0 +1,11 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<script type="text/javascript">
+    function gettoken() {
+        var token = '@Html.AntiForgeryToken()';
+        token = $(token).val();
+        return token;
+    };
+</script>

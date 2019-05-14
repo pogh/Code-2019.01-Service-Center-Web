@@ -1,0 +1,141 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<br />
+
+<div id="errorMessage" class="alert alert-danger col-sm-12" role="alert" style="display:none">
+</div>
+
+<div class="row justify-content-sm-center">
+    @foreach (KeyValuePair<int, string> keyValue in (Dictionary<int, string>)ViewData["AffiliateIds"])
+    {
+        <div class="col">
+            <div class="panel panel-default col-sm-2" style="background-color:@ViewData[string.Concat("AffiliateRgba", keyValue.Key)];">
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="affiliateIds" value="@keyValue.Key" checked="@(((List<int>)ViewData["SelectedAffiliateIds"]).Contains(keyValue.Key))">@keyValue.Value
+                </label>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row">
+    <div class="col-sm-3">
+        <input id="customerNumber" class="form-control" type="text" placeholder="@Localizer["CustomerNumber"].Value">
+    </div>
+    <div class="col-sm-3">
+        <input id="customerName" class="form-control" type="text" placeholder="@Localizer["CustomerName"].Value">
+    </div>
+    <div class="col-sm-3">
+        <input id="zip" class="form-control" type="text" placeholder="@Localizer["ZIP"].Value">
+    </div>
+    <div class="col-sm-3">
+    </div>
+    <div class="col-sm-3">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-3">
+        <input id="orderNr" class="form-control" type="text" placeholder="@Localizer["OrderNr"].Value">
+    </div>
+    <div class="col-sm-3">
+        <input id="emailAddress" class="form-control" type="text" placeholder="@Localizer["EmailAddress"].Value">
+    </div>
+    <div class="col-sm-3">
+        <input id="invoiceNumber" class="form-control" type="text" placeholder="@Localizer["InvoiceNr"].Value">
+    </div>
+    <div class="col-sm-3">
+        <a class="btn btn-success btn-ms" asp-action="StartCustomerEdit"><i class="glyphicon glyphicon-plus"></i></a>
+        <button id="filterButton" class="btn btn-primary">
+            <i class="glyphicon glyphicon-search"></i>
+        </button>
+    </div>
+    <div class="col-sm-3">
+    </div>
+</div>
+
+<div id="searchResult" style="display:none">
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+
+        $('#customerNumber').bind("enterKey", function (e) { filterForm(); });
+        $('#customerNumber').keyup(function (e) { if (e.keyCode == 13) { $(this).trigger("enterKey"); } });
+
+        $('#customerName').bind("enterKey", function (e) {filterForm();});
+        $('#customerName').keyup(function (e) {if (e.keyCode == 13) {$(this).trigger("enterKey");}});
+
+        $('#zip').bind("enterKey", function (e) { filterForm(); });
+        $('#zip').keyup(function (e) { if (e.keyCode == 13) { $(this).trigger("enterKey"); } });
+
+        $('#orderNr').bind("enterKey", function (e) { filterForm(); });
+        $('#orderNr').keyup(function (e) { if (e.keyCode == 13) { $(this).trigger("enterKey"); } });
+
+        $('#emailAddress').bind("enterKey", function (e) { filterForm(); });
+        $('#emailAddress').keyup(function (e) { if (e.keyCode == 13) { $(this).trigger("enterKey"); } });
+
+        $('#invoiceNumber').bind("enterKey", function (e) { filterForm(); });
+        $('#invoiceNumber').keyup(function (e) { if (e.keyCode == 13) { $(this).trigger("enterKey"); } });
+
+        $('#filterButton').bind("enterKey", function (e) { filterForm(); });
+        $('#filterButton').click(function (e) { filterForm(); });
+
+        function filterForm() {
+            try {
+
+                if ($('#filterButton').attr('disabled') != 'disabled') {
+
+                    $('#filterButton').addClass("disabled");
+                    $('#filterButton').attr('disabled', 'disabled');
+                    $('#searchResult').fadeOut();
+                    $('#errorMessage').fadeOut();
+                    $('#errorMessage').text(null);
+
+                    var affiliateIdsArray = [];
+                    $("input[name='affiliateIds']:checked").each(function () { affiliateIdsArray.push(parseInt($(this).val())); });
+
+                    $.ajax({
+                        url: "@Url.Action("CustomerSearchResults", "Order")",
+                        traditional: true,
+                        data: {
+                            affiliateIds: affiliateIdsArray,
+                            customerNumber: $('#customerNumber').val(),
+                            name: $('#customerName').val(),
+                            zip: $('#zip').val(),
+                            orderNr: $('#orderNr').val(),
+                            emailAddress: $('#emailAddress').val(),
+                            invoiceNumber: $('#invoiceNumber').val(),
+                        },
+                        contentType: 'application/html; charset=utf-8',
+                        type: 'GET',
+                        dataType: 'html'
+
+                    })
+                        .then(function (result) {
+                            $('#searchResult').html(result);
+                            $('#searchResult').fadeIn();
+                            $('#filterButton').removeClass("disabled");
+                            $('#filterButton').removeAttr('disabled');
+                        })
+                        .fail(function (xhr, status, error) {
+                            $('#errorMessage').html(status + ': ' + error);
+                            $('#errorMessage').fadeIn();
+                            $('#filterButton').removeClass("disabled");
+                            $('#filterButton').removeAttr('disabled');
+                        });
+                }
+            }
+            catch (err) {
+                $('#errorMessage').html(err.message);
+                $('#errorMessage').fadeIn();
+                $('#filterButton').removeClass("disabled");
+                $('#filterButton').removeAttr('disabled');
+            }
+            finally {
+            }
+        }
+    </script>
+
+}

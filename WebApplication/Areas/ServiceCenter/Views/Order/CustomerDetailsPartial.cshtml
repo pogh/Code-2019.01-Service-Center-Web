@@ -1,0 +1,98 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.OrderBase
+
+<div class="row">
+    <div class="col-sm-12 d-flex justify-content-between">
+        <span style="white-space: nowrap;">
+            <strong>@Model.Affiliate.Key</strong>
+            @Model.CustomerNumber
+            &nbsp;
+            &nbsp;
+        </span>
+
+        <span style="white-space: nowrap;">
+            <strong>@Localizer["CustomerName"].Value</strong>
+            @Model.BillingAddress.FullName
+            &nbsp;
+            &nbsp;
+        </span>
+
+        <span style="white-space: nowrap;">
+            <strong>@Localizer["CustomerAddress"].Value</strong>
+            @Model.BillingAddress.FullAddress
+            &nbsp;
+            &nbsp;
+        </span>
+
+        @if (!string.IsNullOrEmpty(@Model.BillingAddress.EmailAddress))
+        {
+            <span style="white-space: nowrap;">
+                <strong>@Localizer["CustomerEmailAddress"].Value</strong>
+                @Model.BillingAddress.EmailAddress
+                &nbsp;
+                &nbsp;
+            </span>
+        }
+
+        @if (!string.IsNullOrEmpty(@Model.BillingAddress.TelephoneNumber))
+        {
+            <span style="white-space: nowrap;">
+                <strong>@Localizer["CustomerTelephoneNumber"].Value</strong>
+                @Model.BillingAddress.TelephoneNumber
+                &nbsp;
+                &nbsp;
+            </span>
+        }
+
+        @if (!string.IsNullOrEmpty(@Model.BillingAddress.MobileNumber))
+        {
+            <span style="white-space: nowrap;">
+                <strong>@Localizer["CustomerMobileNumber"].Value</strong>
+                @Model.BillingAddress.MobileNumber
+                &nbsp;
+                &nbsp;
+            </span>
+        }
+
+        @if (!string.IsNullOrEmpty(@Model.BillingAddress.FaxNumber))
+        {
+            <span style="white-space: nowrap;">
+                <strong>@Localizer["CustomerFaxNumber"].Value</strong>
+                @Model.BillingAddress.FaxNumber
+                &nbsp;
+                &nbsp;
+            </span>
+        }
+
+        @if (Model.BillingAddress.DoB.HasValue && Model.BillingAddress.DoB > new DateTime(1900, 1, 1))
+        {
+            <span style="white-space: nowrap;">
+                <strong>@Localizer["CustomerDoB"].Value</strong>
+                @Model.BillingAddress.DoB.Value.ToShortDateString()
+                &nbsp;
+                &nbsp;
+            </span>
+        }
+
+        @if (@Model.CustomerGroupId != 0)
+        {
+            <span style="white-space: nowrap;">
+                <strong>@Localizer["CustomerGroup"].Value</strong>
+                @Model.CustomerGroupName
+                @if (Model.CustomerGroupDiscount != 0)
+                {
+                    @Html.Raw("&nbsp;(")
+                    @Model.CustomerGroupDiscount.ToString("0")
+                    @Html.Raw("%)")
+                }
+                &nbsp;
+                &nbsp;
+            </span>
+        }
+
+        <span>
+            <a class="btn btn-primary btn-xs" role="button" asp-action="CustomerEdit">
+                <i class="glyphicon glyphicon-user"></i>
+            </a>
+        </span>
+    </div>
+</div>

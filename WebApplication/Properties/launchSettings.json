@@ -1,0 +1,20 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": true,
+    "anonymousAuthentication": false,
+    "iisExpress": {
+      "applicationUrl": "https://localhost:44393",
+      "sslPort": 44393
+    }
+  },
+  "profiles": {
+    "WebApplication": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "ServiceCenter/Order/CustomerSearch",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

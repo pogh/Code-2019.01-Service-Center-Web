@@ -1,0 +1,152 @@
+﻿@model Company.WebApplication.Areas.ServiceCenter.Models.Order.PartialViews.ArticleSearchResults
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<div id="searchResult">
+    @if (Model.NoResults)
+    {
+        <br />
+        <div class="col-sm-12">
+            <div class="alert alert-info col-sm-12" role="alert">
+                @Localizer["NoResults"].Value
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (Model.ToManyResults)
+        {
+            <br />
+            <div class="col-sm-12">
+                <div class="alert alert-danger col-sm-12" role="alert">
+                    @Localizer["TooManyResults"].Value
+                </div>
+            </div>
+        }
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th>
+                        @Localizer["Pzn"].Value
+                    </th>
+                    <th>
+                        @Localizer["Name"].Value
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                    <th style="width:75px;">
+                        @Localizer["Amount"].Value
+                    </th>
+                    <th style="width:75px">
+                        @Localizer["Price"].Value
+                    </th>
+                    <th style="width:75px">
+                        @Localizer["Availability"].Value
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var article in Model.Articles)
+                {
+                    <tr>
+                        <td>
+                            <div style="display: inline-block">
+                                <button class="btn btn-primary btn-sm" onclick="$('@string.Concat("#articlePictureImg", article.PZN)').attr('src','@article.PictureUrl');$('#@string.Concat("articlePictureTd", article.PZN)').fadeIn('slow');" disabled="@string.IsNullOrEmpty(article.PictureUrl)">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </button>
+                                <a class="btn btn-primary btn-sm" href="@article.WebsiteUrl" target="_blank" disabled="@string.IsNullOrEmpty(article.WebsiteUrl)">
+                                    <i class="glyphicon glyphicon-new-window"></i>
+                                </a>
+                                @* This feature was finished before they decided they didn't want it.  Left if in for Special Users *@
+                                @if ((await AuthorizationService.AuthorizeAsync(User, "SpecialUser")).Succeeded)
+                                {
+                                    <button class="btn btn-primary btn-sm" onclick="showPriceComparison(@article.PZN)">
+                                        <i class="glyphicon glyphicon-euro"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            @article.PZN.ToString(Company.WebApplication.Areas.ServiceCenter.Models.Order.Views.Invoice.PZNStringFormat)
+                        </td>
+                        <td>
+                            @article.DisplayName
+                        </td>
+                        <td>
+                            @if (article.DateTimeField != DateTime.MinValue)
+                            {
+                                <span class="text-muted" style="white-space: nowrap;">
+                                    @article.DateTimeField.ToShortDateString()
+                                    @Html.Raw("&nbsp;(")
+                                    @article.IntegerField
+                                    @Html.Raw(")&nbsp;")
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            <span style="white-space: nowrap;">
+                                @article.PackagingAmount
+                                @Html.Raw("&nbsp;")
+                                @article.PackagingAmountUnit
+                                @if (article.PackagingAmount != article.PackagingAmountTotal.ToString())
+                                {
+                                    @Html.Raw("(")
+                                    @article.PackagingAmountTotal
+                                    @Html.Raw("&nbsp;")
+                                    @article.PackagingAmountUnit
+                                    @Html.Raw(")")
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @if (article.AvailabilityType != 4)
+                            {
+                                @article.SalePrice.ToString("0.00 €")
+                            }
+                        </td>
+                        <td>
+                            @if (article.IsPrescriptionOnly && !User.IsInRole("APO-SG-Apotheker"))
+                            {
+                                @Localizer["PrescriptionOnly"].Value
+                            }
+                            else
+                            {
+                                @Localizer[string.Concat("Availability", article.AvailabilityType)].Value
+                            }
+                        </td>
+                        <td>
+                            @{
+                                bool disableAdding = (article.IsLocked || !article.IsOnline || article.AvailabilityType == 0 || article.AvailabilityType == 4 || article.AvailabilityType == 6 || (article.IsPrescriptionOnly && !User.IsInRole("APO-SG-Apotheker")));
+                            }
+                            <button class="btn btn-success btn-sm" onclick="addInvoiceItem(@article.PZN, @article.VAT.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), @article.SalePrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), @article.PriceSavings.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) )" disabled="@(disableAdding)">
+                                <i class="glyphicon glyphicon-plus"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="@string.Concat("articlePictureTd", article.PZN)" colspan="4" hidden>
+                            <img id="@string.Concat("articlePictureImg", article.PZN)" style="width:80%" />
+                        </td>
+                        <td id="@string.Concat("priceComparisonTd", article.PZN)" colspan="4" hidden>
+                            <div id="@string.Concat("priceComparisonDiv", article.PZN)" class="text-muted"></div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    @if (Context.User.IsInRole("APO-SG-Entwicklung"))
+    {
+        <div class="col-sm-12">
+            <p class="text-muted pull-right small">@ViewData["QueryRunTime"]</p>
+        </div>
+    }
+</div>

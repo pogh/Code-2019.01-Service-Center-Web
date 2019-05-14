@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@Localizer["Title"]</title>
+</head>
+<body>
+
+    <h1>💣 @Localizer["H1"]</h1>
+    <h2>@ViewData["message"]</h2>
+    <h3>@ViewData["path"]</h3>
+    <code style="white-space: pre-line">@ViewData["stacktrace"]</code>
+
+</body>
+</html>

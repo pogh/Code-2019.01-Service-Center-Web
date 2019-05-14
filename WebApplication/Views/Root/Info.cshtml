@@ -1,0 +1,16 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["code"]</title>
+</head>
+<body>
+
+    <h1>💣 @ViewData["code"]</h1>
+    <h2>@Localizer[(string)@ViewData["value"]]</h2>
+    <small>@User.Identity.Name</small>
+
+</body>
+</html>

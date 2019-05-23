@@ -1,8 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 # Service Center (Codename: Concordia)
 
 ## Einleitung
